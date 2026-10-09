@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id                     String   @id @default(cuid())
+  name                   String
+  projectNumber          String?
+  scanDate               String? // date-only YYYY-MM-DD
+  executor               String?
+  planner                String?
+  projectPhase           String?
+  scanResponsible        String
+  constructionMethodType String?
+  scanVersion            String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  revision               Int      @default(1)
+
+  quickscanAnswers QuickscanAnswer[]
+  materialStreams  ProjectMaterialStream[]
+  assessments      MaterialAssessment[]
+  evaluationStreams EvaluationStream[]
+  evaluation       ProjectEvaluation?
+}
+
+model QuickscanDefinition {
+  code      String @id
+  sortOrder Int
+  subject   String
+  question  String
+  sourceRef String
+}
+
+model QuickscanAnswer {
+  id             String   @id @default(cuid())
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  questionCode   String
+  status         String?
+  followUpAction String?
+  responsible    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([projectId, questionCode])
+}
+
+model MaterialStreamDefinition {
+  code      String @id
+  label     String
+  examples  String
+  sortOrder Int
+  sourceRef String
+}
+
+model ProjectMaterialStream {
+  id                String   @id @default(cuid())
+  projectId         String
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  streamCode        String
+  occurs            String?
+  constructionPhase String?
+  quantity          String? // exact decimal as string
+  unit              String?
+  causeCode         String?
+  nextRoute         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  revision          Int      @default(1)
+
+  assessments MaterialAssessment[]
+
+  @@unique([projectId, streamCode])
+}
+
+model MaterialAssessment {
+  id                      String   @id @default(cuid())
+  projectId               String
+  project                 Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectMaterialStreamId String?
+  projectMaterialStream   ProjectMaterialStream? @relation(fields: [projectMaterialStreamId], references: [id], onDelete: SetNull)
+  materialType            String?
+  condition               String?
+  reusable                String?
+  returnConfirmed         String?
+  recyclable              String?
+  finalRoute              String?
+  storageLocation         String?
+  followUpAction          String?
+  responsible             String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  revision                Int      @default(1)
+}
+
+model EvaluationGroupDefinition {
+  code      String @id
+  label     String
+  sortOrder Int
+  sourceRef String
+}
+
+model EvaluationStream {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  groupCode        String
+  actualQuantity   String?
+  unit             String?
+  containerChanges Int?
+  route            String?
+  explanation      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([projectId, groupCode])
+}
+
+model ProjectEvaluation {
+  id                String   @id @default(cuid())
+  projectId         String   @unique
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  attentionStream   String?
+  workedWell        String?
+  didNotWork        String?
+  nextProjectChange String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  revision          Int      @default(1)
+}
+
+model ProductValidation {
+  id                 String   @id @default(cuid())
+  singletonKey       String   @unique @default("default")
+  testedBy           String?
+  role               String?
+  date               String?
+  projectSituation   String?
+  clarityScore       Int?
+  practicalityScore  Int?
+  completenessScore  Int?
+  timeBurdenScore    Int?
+  wouldUse           String?
+  fitsWaal           String?
+  keyFeedback        String?
+  processedChange    String?
+  remark             String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  revision           Int      @default(1)
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ipHash    String
+  attemptedAt DateTime @default(now())
+
+  @@index([ipHash, attemptedAt])
+}
