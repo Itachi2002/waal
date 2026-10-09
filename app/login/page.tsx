@@ -1,9 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BrandMark } from "@/components/layout/BrandMark";
-import { Suspense } from "react";
 
 function LoginForm() {
   const search = useSearchParams();
@@ -37,35 +36,36 @@ function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-full max-w-md space-y-4 rounded-md border border-[#d8dee5] bg-white p-6 shadow-sm"
-    >
-      <h1 className="text-xl font-semibold">Lokale aanmelding</h1>
-      <p className="text-sm text-[#555]">
-        Eén lokale beheerder. Geen zelfregistratie.
-      </p>
+    <form onSubmit={onSubmit} className="w-full space-y-4" noValidate>
+      <div>
+        <h1 className="text-xl font-semibold text-[var(--waal-black)]">
+          Lokale aanmelding
+        </h1>
+        <p className="mt-1 text-sm text-[#666]">
+          Eén lokale beheerder. Geen zelfregistratie.
+        </p>
+      </div>
       {error ? (
         <p className="field-error" role="alert">
           {error}
         </p>
       ) : null}
       <div>
-        <label htmlFor="username" className="block text-sm font-medium">
+        <label htmlFor="username" className="block text-sm font-medium mb-1">
           Gebruikersnaam
         </label>
         <input
           id="username"
           name="username"
           autoComplete="username"
-          className="mt-1 w-full min-h-[44px] rounded border border-[#c5ced6] px-3"
+          className="input-app"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">
+        <label htmlFor="password" className="block text-sm font-medium mb-1">
           Wachtwoord
         </label>
         <input
@@ -73,7 +73,7 @@ function LoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
-          className="mt-1 w-full min-h-[44px] rounded border border-[#c5ced6] px-3"
+          className="input-app"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -88,11 +88,21 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#ffffff_0%,#f5f7f9_55%,#e8eef3_100%)] flex flex-col items-center justify-center gap-8 p-6">
-      <BrandMark />
-      <Suspense fallback={<p>Laden…</p>}>
-        <LoginForm />
-      </Suspense>
+    <main className="app-shell !shadow-none">
+      <div className="flex flex-1 flex-col justify-center px-5 py-10 pt-[max(2.5rem,env(safe-area-inset-top))]">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <BrandMark size="lg" />
+          <p className="mt-4 text-base font-semibold text-[var(--waal-black)]">
+            Afval- en reststromen
+          </p>
+          <p className="mt-1 text-sm text-[#666]">Projectscan voor op de bouw</p>
+        </div>
+        <div className="surface-card !border-0 !bg-[var(--waal-gray)]">
+          <Suspense fallback={<p>Laden…</p>}>
+            <LoginForm />
+          </Suspense>
+        </div>
+      </div>
     </main>
   );
 }

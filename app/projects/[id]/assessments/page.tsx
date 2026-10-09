@@ -21,8 +21,13 @@ export default async function AssessmentsPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-4">Materiaalbeoordeling</h1>
-      <Suspense fallback={<p>Laden…</p>}>
+      <header className="mb-5">
+        <h1 className="page-title">Materiaalbeoordeling</h1>
+        <p className="mt-1 text-sm text-[#666]">
+          Specifieke materialen beoordelen en route vastleggen.
+        </p>
+      </header>
+      <Suspense fallback={<p className="text-sm text-[#666]">Laden…</p>}>
         <AssessmentsPanel
           projectId={id}
           assessments={assessments}

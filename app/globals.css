@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --waal-blue: #1c7cb8;
-  --waal-blue-dark: #155a86;
+  /* Voorlopige tokens uit logo (JPEG); geen officiële huisstijlcode. */
+  --waal-blue: #0072bc;
+  --waal-blue-dark: #005a96;
   --waal-black: #1c1c1c;
   --waal-white: #ffffff;
-  --waal-gray: #f5f7f9;
+  --waal-gray: #f3f6f8;
   --waal-text: #222222;
   --waal-attention: #8a5a00;
   --waal-attention-bg: #fff6e5;
@@ -13,6 +14,9 @@
   --waal-positive-bg: #e8f6ee;
   --waal-neutral: #555555;
   --waal-neutral-bg: #eef1f4;
+  --app-header-h: 5.25rem;
+  --app-tab-h: 4.5rem;
+  --app-max: 28rem;
 }
 
 @theme inline {
@@ -24,16 +28,21 @@
   --color-waal-text: var(--waal-text);
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--waal-gray);
   color: var(--waal-text);
   font-family:
-    "Segoe UI",
     "Helvetica Neue",
+    Helvetica,
+    "Segoe UI",
     Arial,
     sans-serif;
   margin: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 *:focus-visible {
@@ -41,17 +50,61 @@ body {
   outline-offset: 2px;
 }
 
+/* Mobiele app-shell: gecentreerde kolom op grote schermen */
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--app-max);
+  margin: 0 auto;
+  background: var(--waal-white);
+  box-shadow: 0 0 0 1px #e5ebf0;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --app-max: 42rem;
+  }
+
+  body {
+    background: linear-gradient(180deg, #eef3f7 0%, #f5f7f9 100%);
+  }
+
+  .app-shell {
+    min-height: 100dvh;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --app-max: 56rem;
+  }
+}
+
+.app-main {
+  flex: 1;
+  padding: 1rem 1rem calc(var(--app-tab-h) + 1.25rem);
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #f7fafc 0%, #ffffff 42%);
+}
+
+.app-main--no-tabs {
+  padding-bottom: 1.5rem;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0.6rem 1.1rem;
-  border-radius: 0.35rem;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.65rem 1.15rem;
+  border-radius: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
+  font-size: 1rem;
 }
 
 .btn-primary {
@@ -93,4 +146,75 @@ body {
 .status-attention {
   color: var(--waal-attention);
   background: var(--waal-attention-bg);
+}
+
+.surface-card {
+  background: var(--waal-white);
+  border: 1px solid #e2e8ee;
+  border-radius: 1.1rem;
+  padding: 1.1rem;
+  box-shadow: 0 1px 2px rgba(28, 28, 28, 0.03);
+}
+
+.input-app {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 0.75rem;
+  border: 1px solid #c5ced6;
+  background: var(--waal-white);
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+}
+
+.page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--waal-black);
+  line-height: 1.2;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--waal-black);
+}
+
+.info-banner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: #e8f3fa;
+  color: #1f3a4d;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: var(--waal-blue-dark);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  padding: 1.75rem 1rem;
+  border-radius: 1.1rem;
+  border: 1px dashed #cfd8e0;
+  background: var(--waal-gray);
+  color: var(--waal-text);
 }

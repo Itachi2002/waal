@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { getSessionUser } from "@/lib/auth/session";
 import { listProjects } from "@/lib/services/projects";
+import { IconArrowRight, IconPlus } from "@/components/icons/Icons";
 
 export default async function ProjectsPage() {
   const session = await getSessionUser();
@@ -10,47 +11,61 @@ export default async function ProjectsPage() {
   const projects = await listProjects();
 
   return (
-    <div>
+    <div className="app-shell">
       <AppHeader />
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-semibold">Projecten</h1>
-          <Link href="/projects/new" className="btn btn-primary">
-            Nieuw project
+      <main className="app-main app-main--no-tabs">
+        <div className="mb-5 flex items-end justify-between gap-3">
+          <div>
+            <h1 className="page-title">Projecten</h1>
+            <p className="mt-1 text-sm text-[#666]">
+              Kies een scan of start een nieuw project.
+            </p>
+          </div>
+          <Link
+            href="/projects/new"
+            className="btn btn-primary shrink-0 gap-1.5 !px-3.5"
+            aria-label="Nieuw project"
+          >
+            <IconPlus className="h-4 w-4" />
+            Nieuw
           </Link>
         </div>
-        <p className="mb-4 text-sm text-[#555]">
-          Eenvoudige projectlijst voor de lokale scan. Geen KPI&apos;s of scores.
-        </p>
+
         {projects.length === 0 ? (
-          <p className="rounded border border-[#d8dee5] bg-white p-6">
-            Nog geen projecten. Maak een nieuw project aan om te starten.
-          </p>
+          <div className="empty-state">
+            <p className="font-medium">Nog geen projecten</p>
+            <p className="text-sm text-[#666]">Tik op Nieuw om te starten.</p>
+          </div>
         ) : (
           <ul className="space-y-3">
             {projects.map((p) => (
               <li key={p.id}>
                 <Link
                   href={`/projects/${p.id}/start`}
-                  className="block rounded-md border border-[#d8dee5] bg-white p-4 hover:border-[var(--waal-blue)]"
+                  className="surface-card flex items-center gap-3 active:bg-[var(--waal-gray)]"
                 >
-                  <span className="font-semibold">{p.name}</span>
-                  <span className="block text-sm text-[#555] mt-1">
-                    Nummer: {p.projectNumber || "—"} · Scan: {p.scanResponsible}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <span className="block font-semibold leading-snug">
+                      {p.name}
+                    </span>
+                    <span className="mt-1 block text-sm text-[#666]">
+                      {p.projectNumber || "Geen nummer"} · {p.scanResponsible}
+                    </span>
+                  </div>
+                  <IconArrowRight className="h-5 w-5 shrink-0 text-[#9aa5b1]" />
                 </Link>
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-8">
-          <Link href="/validation" className="text-[var(--waal-blue-dark)] underline">
-            Onderzoeksvalidatie beroepsproduct
+
+        <p className="mt-8 text-center text-sm">
+          <Link
+            href="/validation"
+            className="font-medium text-[var(--waal-blue-dark)] underline"
+          >
+            Onderzoeksvalidatie
           </Link>
-          <span className="text-sm text-[#555]">
-            {" "}
-            — apart van projectstappen
-          </span>
         </p>
       </main>
     </div>

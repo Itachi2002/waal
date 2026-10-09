@@ -6,6 +6,7 @@ import {
 } from "@/lib/domain/catalogs";
 import { getSessionUser } from "@/lib/auth/session";
 import { getProject } from "@/lib/services/projects";
+import { IconArrowRight, IconCheck } from "@/components/icons/Icons";
 
 export default async function StartPage({
   params,
@@ -18,44 +19,63 @@ export default async function StartPage({
   if (!project) notFound();
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-md border border-[#d8dee5] bg-white p-6">
-        <h1 className="text-2xl font-semibold mb-2">Projectstart</h1>
-        <p className="text-[#555] mb-4">
-          Doel: per woningbouwproject inzicht in vrijkomende afval- en
-          reststromen, oorzaken en passende vervolgstappen. Ondersteunt
-          werkvoorbereiding en uitvoering. Geen automatische systeemkoppeling;
-          gebruik beschikbare projectgegevens handmatig.
+    <div className="space-y-5">
+      <header>
+        <h1 className="page-title">Projectstart</h1>
+        <p className="mt-2 text-sm leading-relaxed text-[#555]">
+          Inzicht in vrijkomende afval- en reststromen, oorzaken en passende
+          vervolgstappen. Geen automatische systeemkoppeling — gegevens handmatig
+          gebruiken.
         </p>
-        <h2 className="font-semibold mt-4 mb-2">Vijf stappen</h2>
-        <ol className="list-decimal pl-5 space-y-1">
-          {PROJECT_START_STEPS.map((s) => (
-            <li key={s}>{s}</li>
+      </header>
+
+      <section className="surface-card">
+        <h2 className="section-title mb-3">Vijf stappen</h2>
+        <ol className="space-y-2.5">
+          {PROJECT_START_STEPS.map((s, i) => (
+            <li
+              key={s}
+              className="flex gap-3 rounded-xl bg-[var(--waal-gray)] px-3 py-2.5 text-sm"
+            >
+              <span className="step-badge">{i + 1}</span>
+              <span className="leading-snug">{s}</span>
+            </li>
           ))}
         </ol>
-        <h2 className="font-semibold mt-6 mb-2">Beslisvolgorde</h2>
-        <p className="mb-2">{DECISION_ORDER.join(" → ")}</p>
-        <ul className="text-sm text-[#555] list-disc pl-5 space-y-1">
-          <li>
-            Specifieke afvalroutes altijd passend toepassen; ze zijn geen
-            laagste voorkeursroute.
+      </section>
+
+      <section className="surface-card">
+        <h2 className="section-title mb-3">Beslisvolgorde</h2>
+        <div className="flex flex-wrap items-center gap-1.5 text-sm font-medium">
+          {DECISION_ORDER.map((step, i) => (
+            <span key={step} className="inline-flex items-center gap-1.5">
+              <span className="rounded-lg bg-[#e8f3fa] px-2.5 py-1 text-[var(--waal-blue-dark)]">
+                {step}
+              </span>
+              {i < DECISION_ORDER.length - 1 ? (
+                <IconArrowRight className="h-3.5 w-3.5 text-[#9aa5b1]" />
+              ) : null}
+            </span>
+          ))}
+        </div>
+        <ul className="mt-4 space-y-2 text-sm text-[#555]">
+          <li className="flex gap-2">
+            <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waal-blue)]" />
+            Specifieke afvalroutes altijd passend toepassen.
           </li>
-          <li>
-            BSA is de laatste route wanneer een hogere of specifieke route niet
-            passend is.
+          <li className="flex gap-2">
+            <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waal-blue)]" />
+            BSA is de laatste route wanneer geen hogere of specifieke route past.
           </li>
-          <li>
-            «Voorkomen» is een werkinstructie, geen dropdownwaarde in de scan.
-          </li>
-          <li>
-            Nieuwe relevante informatie na controle handmatig doorgeven aan de
-            KAM-coördinator (geen mail-/notificatiefunctie in deze app).
+          <li className="flex gap-2">
+            <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waal-blue)]" />
+            «Voorkomen» is werkinstructie, geen dropdownwaarde.
           </li>
         </ul>
       </section>
 
-      <section className="rounded-md border border-[#d8dee5] bg-white p-6">
-        <h2 className="text-xl font-semibold mb-4">Projectgegevens</h2>
+      <section className="surface-card">
+        <h2 className="section-title mb-4">Projectgegevens</h2>
         <ProjectForm
           mode="edit"
           projectId={project.id}

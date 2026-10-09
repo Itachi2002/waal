@@ -19,6 +19,15 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import {
+  IconAlert,
+  IconCheck,
+  IconEdit,
+  IconInfo,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+} from "@/components/icons/Icons";
 
 type StreamOpt = { id: string; streamCode: string; revision: number };
 type Assessment = {
@@ -174,39 +183,63 @@ export function AssessmentsPanel({
     }
   }
 
-  const inputClass =
-    "w-full min-h-[44px] rounded border border-[#c5ced6] bg-white px-3";
+  const inputClass = "input-app";
+
+  const tips = [
+    "Is het materiaal technisch en praktisch bruikbaar?",
+    "Is retour voor dit project bevestigd door leverancier/producent?",
+    "Is het schoon en gescheiden te verwerken?",
+  ];
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-[#555]">
-        Alleen gebruiken wanneer een specifiek materiaal extra beoordeling nodig
-        heeft. Retour route alleen bij bevestiging Ja voor dit project (geen
-        algemene leveranciergarantie). Geen automatische routekeuze uit de drie
-        beslisvragen.
-      </p>
+    <div className="space-y-5">
+      <div className="info-banner">
+        <IconInfo className="mt-0.5 h-5 w-5 shrink-0 text-[var(--waal-blue-dark)]" />
+        <p>
+          Alleen bij extra beoordeling van een specifiek materiaal. Retour alleen
+          bij bevestiging Ja voor dit project. Geen automatische routekeuze.
+        </p>
+      </div>
 
-      <section className="rounded-md border border-[#d8dee5] bg-white p-4">
-        <h2 className="font-semibold mb-2">Beslisvragen (ter ondersteuning)</h2>
-        <ol className="list-decimal pl-5 text-sm space-y-1">
-          <li>Is het materiaal technisch en praktisch bruikbaar?</li>
-          <li>
-            Is retour voor dit project bevestigd door leverancier/producent?
-          </li>
-          <li>Is het schoon en gescheiden te verwerken?</li>
-        </ol>
+      <section className="surface-card !bg-[var(--waal-gray)] !border-0">
+        <h2 className="section-title mb-3">Beslisvragen</h2>
+        <ul className="space-y-2.5">
+          {tips.map((t, i) => (
+            <li
+              key={t}
+              className="flex gap-3 rounded-xl bg-white px-3 py-2.5 text-sm leading-snug"
+            >
+              <span className="step-badge">{i + 1}</span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Beoordelingen</h2>
-        <button type="button" className="btn btn-primary" onClick={startNew}>
-          Nieuwe beoordeling
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="section-title">Beoordelingen</h2>
+        <button
+          type="button"
+          className="btn btn-primary !min-h-11 gap-2 !px-3.5 text-sm"
+          onClick={startNew}
+          aria-label="Nieuwe beoordeling"
+        >
+          <IconPlus className="h-4 w-4" />
+          Nieuw
         </button>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {assessments.length === 0 ? (
-          <li className="text-sm text-[#555]">Nog geen beoordelingen.</li>
+          <li className="empty-state">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e8f3fa] text-[var(--waal-blue-dark)]">
+              <IconSearch className="h-6 w-6" />
+            </span>
+            <p className="font-medium">Nog geen beoordelingen</p>
+            <p className="text-sm text-[#666]">
+              Tik op Nieuw om een materiaal te beoordelen.
+            </p>
+          </li>
         ) : (
           assessments.map((a) => {
             const streamLabel = a.projectMaterialStream
@@ -214,45 +247,59 @@ export function AssessmentsPanel({
                   (m) => m.code === a.projectMaterialStream!.streamCode,
                 )?.label
               : null;
+            const routeLabel = a.finalRoute
+              ? ASSESSMENT_ROUTE_LABELS[
+                  a.finalRoute as keyof typeof ASSESSMENT_ROUTE_LABELS
+                ]
+              : "Nog te bepalen";
             return (
-              <li
-                key={a.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded border border-[#d8dee5] bg-white p-3"
-              >
-                <div>
-                  <p className="font-medium">
-                    {a.materialType || "Zonder materiaalomschrijving"}
-                  </p>
-                  <p className="text-sm text-[#555]">
-                    {streamLabel ? `Stroom: ${streamLabel}` : "Geen stroomkoppeling"}
-                    {" · "}
-                    Route:{" "}
-                    {a.finalRoute
-                      ? ASSESSMENT_ROUTE_LABELS[
-                          a.finalRoute as keyof typeof ASSESSMENT_ROUTE_LABELS
-                        ]
-                      : "Nog te bepalen"}
-                    {a.returnConfirmed === "CHECK" ? (
-                      <span className="status-attention ml-2 rounded px-1">
-                        Nog controleren
-                      </span>
-                    ) : null}
-                  </p>
+              <li key={a.id} className="surface-card space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold leading-snug">
+                      {a.materialType || "Zonder materiaalomschrijving"}
+                    </p>
+                    <p className="mt-1 text-sm text-[#666]">
+                      {streamLabel ?? "Geen stroomkoppeling"}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      a.finalRoute
+                        ? "status-yes"
+                        : "status-attention"
+                    }`}
+                  >
+                    {a.finalRoute ? (
+                      <IconCheck className="h-3.5 w-3.5" />
+                    ) : (
+                      <IconAlert className="h-3.5 w-3.5" />
+                    )}
+                    {routeLabel}
+                  </span>
                 </div>
+                {a.returnConfirmed === "CHECK" ? (
+                  <p className="status-attention inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium">
+                    <IconAlert className="h-3.5 w-3.5" />
+                    Retour nog controleren
+                  </p>
+                ) : null}
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary flex-1 gap-2 !min-h-11 text-sm"
                     onClick={() => startEdit(a)}
                   >
+                    <IconEdit className="h-4 w-4" />
                     Bewerken
                   </button>
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary gap-2 !min-h-11 !px-3 text-sm"
                     onClick={() => onDelete(a.id)}
+                    aria-label="Verwijderen"
                   >
-                    Verwijderen
+                    <IconTrash className="h-4 w-4" />
                   </button>
                 </div>
               </li>
@@ -264,10 +311,10 @@ export function AssessmentsPanel({
       {showForm ? (
         <form
           onSubmit={onSubmit}
-          className="rounded-md border border-[#d8dee5] bg-white p-4 space-y-3"
+          className="surface-card space-y-3 !border-[var(--waal-blue)]/30"
           noValidate
         >
-          <h3 className="font-semibold">
+          <h3 className="section-title">
             {editingId ? "Beoordeling bewerken" : "Nieuwe beoordeling"}
           </h3>
           <FormSelect
@@ -388,7 +435,7 @@ export function AssessmentsPanel({
           <FormField id="followUpAction" label="Vervolgactie" error={errors.followUpAction}>
             <textarea
               id="followUpAction"
-              className="w-full min-h-[88px] rounded border border-[#c5ced6] px-3 py-2"
+              className="input-app min-h-[88px]"
               value={form.followUpAction}
               onChange={(e) => {
                 setForm((f) => ({ ...f, followUpAction: e.target.value }));

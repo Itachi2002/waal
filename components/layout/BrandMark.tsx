@@ -1,31 +1,44 @@
-/**
- * Logo: plaats `public/brand/waal-logo.jpeg` (zie reference/README).
- * Zolang die ontbreekt: tekstplaceholder «Waal» (geen zelfbedacht logo).
- * Client-safe — geen filesystem-check in de browserbundel.
- */
-export function BrandMark({ className = "" }: { className?: string }) {
-  const hasLogo = process.env.NEXT_PUBLIC_HAS_WAAL_LOGO === "true";
+"use client";
 
-  if (hasLogo) {
+import { useState } from "react";
+
+/**
+ * Meegeleverd Waal-logo ongewijzigd (geen recolor/stretch).
+ * Bij ontbrekende asset: tekstplaceholder «Waal».
+ */
+export function BrandMark({
+  className = "",
+  size = "md",
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  const [failed, setFailed] = useState(false);
+  const height =
+    size === "lg" ? "h-16 sm:h-[4.75rem]" : size === "sm" ? "h-12" : "h-14";
+
+  if (failed) {
     return (
-      // Logo wordt ongewijzigd uit public/brand geserveerd (geen Next Image-optimalisatie/recolor).
-      // eslint-disable-next-line @next/next/no-img-element -- bronasset ongewijzigd houden
-      <img
-        src="/brand/waal-logo.jpeg"
-        alt="Waal"
-        width={160}
-        height={64}
-        className={`h-12 w-auto object-contain ${className}`}
-      />
+      <span
+        className={`font-bold tracking-tight text-[var(--waal-black)] ${
+          size === "lg" ? "text-4xl" : size === "sm" ? "text-2xl" : "text-3xl"
+        } ${className}`}
+        aria-label="Waal"
+      >
+        Waal
+      </span>
     );
   }
 
   return (
-    <span
-      className={`text-2xl font-bold tracking-tight text-[var(--waal-black)] ${className}`}
-      aria-label="Waal"
-    >
-      Waal
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element -- bronlogo ongewijzigd houden
+    <img
+      src="/brand/waal-logo.jpeg"
+      alt="Waal"
+      width={220}
+      height={88}
+      className={`${height} w-auto max-w-[240px] object-contain object-left ${className}`}
+      onError={() => setFailed(true)}
+    />
   );
 }

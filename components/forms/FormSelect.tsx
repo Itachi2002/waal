@@ -32,7 +32,7 @@ export function FormSelect({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className="w-full min-h-[44px] rounded border border-[#c5ced6] bg-white px-3"
+        className="input-app"
       >
         <option value="">{emptyLabel}</option>
         {options.map((o) => (

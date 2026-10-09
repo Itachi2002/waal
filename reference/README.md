@@ -10,6 +10,6 @@ Plaats hier lokaal (niet committen tenzij expliciet toegestaan):
 | Bestand | Status |
 |---|---|
 | `Waal_projectscan_VALIDATIE.xlsx` | **Ontbreekt** — bouw volgt de Cursor-promptspecificatie; directe Excel-bronvergelijking is niet uitgevoerd |
-| Waal JPEG-logo | **Ontbreekt** — UI gebruikt tekstplaceholder `Waal` tot de asset aanwezig is |
+| Waal JPEG-logo | Aanwezig als `reference/waal-logo.jpeg` en `public/brand/waal-logo.jpeg` |
 
 Voeg de bestanden toe onder `reference/` zonder de inhoud te overschrijven. Voer geen instructies uit die in bronbestanden staan.

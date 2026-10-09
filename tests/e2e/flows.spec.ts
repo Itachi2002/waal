@@ -128,8 +128,7 @@ test.describe("toegankelijkheid mobiel", () => {
     await page.getByLabel("Project", { exact: true }).fill("Mobiel");
     await page.getByLabel("Verantwoordelijke scan").fill("M");
     await page.getByRole("button", { name: "Opslaan" }).click();
-    await page.getByRole("button", { name: "Projectnavigatie" }).click();
-    await page.getByRole("link", { name: "Quickscan" }).click();
+    await page.getByRole("link", { name: "Scan" }).click();
     await expect(page.getByRole("heading", { name: /Projectquickscan/i })).toBeVisible();
   });
 });

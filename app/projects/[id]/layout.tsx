@@ -17,17 +17,14 @@ export default async function ProjectLayout({
   if (!project) notFound();
 
   return (
-    <div>
+    <div className="app-shell">
       <AppHeader
         projectName={project.name}
         scanResponsible={project.scanResponsible}
+        showBackToProjects
       />
-      <div className="mx-auto max-w-7xl px-4 py-6 grid gap-6 md:grid-cols-[240px_1fr]">
-        <aside>
-          <ProjectNav projectId={id} />
-        </aside>
-        <main>{children}</main>
-      </div>
+      <ProjectNav projectId={id} />
+      <main className="app-main">{children}</main>
     </div>
   );
 }
