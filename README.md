@@ -2,13 +2,11 @@
 
 Nederlandstalige webapp voor het afstudeerproject: inzicht in vrijkomende afval- en reststromen per woningbouwproject.
 
-## Online (GitHub Pages)
+## Online (Vercel)
 
-**https://itachi2002.github.io/waal/**
+Koppel de GitHub-repo `Itachi2002/waal` aan Vercel (zie `docs/deploy.md`). Push naar `main` = nieuwe deploy.
 
-Eenmalig in de repo: **Settings → Pages → Source = GitHub Actions**.
-
-Gegevens worden opgeslagen in **localStorage** van de browser (geen serverdatabase op Pages). Zie `docs/deploy.md`.
+Gegevens worden opgeslagen in **localStorage** van de browser.
 
 ## Doel en afbakening
 
@@ -25,7 +23,7 @@ Gegevens worden opgeslagen in **localStorage** van de browser (geen serverdataba
 | Opslag (online) | localStorage |
 | Validatie | Domeinregels in `lib/validation` |
 | Tests | Vitest (unit) |
-| Deploy | GitHub Actions → GitHub Pages |
+| Deploy | Vercel |
 
 ## Lokaal starten
 
@@ -43,8 +41,6 @@ npm run build
 npx serve out
 ```
 
-Navigeer naar het pad `/waal/` (basePath).
-
 ## Routes
 
 | Pad | Inhoud |
@@ -57,9 +53,3 @@ Navigeer naar het pad `/waal/` (basePath).
 | `/projects/assessments/?id=` | Materiaalbeoordeling |
 | `/projects/evaluation/?id=` | Evaluatie |
 | `/validation/` | Onderzoeksvalidatie |
-
-## Documentatie
-
-- `docs/deploy.md` — GitHub Pages
-- `docs/source-map.md` — requirements
-- `docs/user-guide.md` — gebruik

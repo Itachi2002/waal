@@ -1,40 +1,35 @@
-# Online zetten via GitHub Pages
+# Online zetten via Vercel
 
-Live URL (na eerste succesvolle deploy):
+Gegevens blijven in **localStorage** van de browser (geen serverdatabase). Geen login.
 
-**https://itachi2002.github.io/waal/**
+## Koppelen (eenmalig)
 
-## Architectuur
+1. Ga naar [vercel.com](https://vercel.com) en log in (GitHub).
+2. **Add New Project** → importeer `Itachi2002/waal`.
+3. Framework: Next.js (automatisch). Geen env-vars nodig.
+4. Deploy.
 
-GitHub Pages host alleen statische bestanden. Daarom:
+Elke push naar `main` triggert een nieuwe deploy.
 
-- Next.js `output: 'export'` met `basePath` `/waal`
-- Gegevens in **localStorage** (per browser), geen server/SQLite online
-- Geen login
-
-Wissen van browserdata of andere browser = andere/lege data.
-
-## Eenmalig in GitHub
-
-1. Open https://github.com/Itachi2002/waal  
-2. **Settings → Pages**  
-3. **Source:** GitHub Actions  
-4. Push naar `main` triggert [.github/workflows/pages.yml](../.github/workflows/pages.yml)
-
-## Lokaal bouwen / previewen
+## Lokaal
 
 ```bash
 npm install
+npm run dev
+```
+
+Open http://localhost:3000
+
+### Static build preview
+
+```bash
 npm run build
 npx serve out
 ```
 
-Open daarna de URL die `serve` toont. Let op: met `basePath` `/waal` moet je lokaal naar `/waal/` navigeren, of tijdelijk `basePath` uitzetten voor pure localhost-dev (`npm run dev` werkt zonder export).
-
-## Ontwikkelen
+## CLI (optioneel)
 
 ```bash
-npm run dev
+npx vercel login
+npx vercel --prod
 ```
-
-Dev-server gebruikt dezelfde localStorage-store (geen API).
