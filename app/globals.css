@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --waal-blue: #1c7cb8;
+  --waal-blue-dark: #155a86;
+  --waal-black: #1c1c1c;
+  --waal-white: #ffffff;
+  --waal-gray: #f5f7f9;
+  --waal-text: #222222;
+  --waal-attention: #8a5a00;
+  --waal-attention-bg: #fff6e5;
+  --waal-positive: #1a6b3c;
+  --waal-positive-bg: #e8f6ee;
+  --waal-neutral: #555555;
+  --waal-neutral-bg: #eef1f4;
+}
+
+@theme inline {
+  --color-waal-blue: var(--waal-blue);
+  --color-waal-blue-dark: var(--waal-blue-dark);
+  --color-waal-black: var(--waal-black);
+  --color-waal-white: var(--waal-white);
+  --color-waal-gray: var(--waal-gray);
+  --color-waal-text: var(--waal-text);
+}
+
+body {
+  background: var(--waal-gray);
+  color: var(--waal-text);
+  font-family:
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+*:focus-visible {
+  outline: 3px solid var(--waal-blue);
+  outline-offset: 2px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.35rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--waal-blue-dark);
+  color: var(--waal-white);
+}
+
+.btn-primary:hover {
+  background: var(--waal-black);
+}
+
+.btn-secondary {
+  background: var(--waal-white);
+  color: var(--waal-text);
+  border-color: #c5ced6;
+}
+
+.field-error {
+  color: #8b1a1a;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.status-yes {
+  color: var(--waal-positive);
+  background: var(--waal-positive-bg);
+}
+
+.status-no {
+  color: var(--waal-attention);
+  background: var(--waal-attention-bg);
+}
+
+.status-na {
+  color: var(--waal-neutral);
+  background: var(--waal-neutral-bg);
+}
+
+.status-attention {
+  color: var(--waal-attention);
+  background: var(--waal-attention-bg);
+}
