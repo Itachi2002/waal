@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BrandMark } from "./BrandMark";
-import { LogoutButton } from "./LogoutButton";
 import { IconFolder } from "@/components/icons/Icons";
 
 export function AppHeader({
@@ -40,19 +39,16 @@ export function AppHeader({
             </p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          {showBackToProjects ? (
-            <Link
-              href="/projects"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d8dee5] bg-white text-[var(--waal-blue-dark)]"
-              aria-label="Alle projecten"
-              title="Projecten"
-            >
-              <IconFolder className="h-5 w-5" />
-            </Link>
-          ) : null}
-          <LogoutButton />
-        </div>
+        {showBackToProjects ? (
+          <Link
+            href="/projects"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d8dee5] bg-white text-[var(--waal-blue-dark)]"
+            aria-label="Alle projecten"
+            title="Projecten"
+          >
+            <IconFolder className="h-5 w-5" />
+          </Link>
+        ) : null}
       </div>
     </header>
   );

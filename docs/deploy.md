@@ -1,63 +1,61 @@
-# Online zetten
+# Online zetten (demo zonder login)
 
 ## Waarom niet GitHub Pages?
 
-GitHub Pages serveert **alleen statische bestanden** (HTML/CSS/JS). Deze app heeft:
+GitHub Pages serveert **alleen statische bestanden** (HTML/CSS/JS). Deze app heeft nog steeds:
 
-- Next.js server / API-routes
-- login met sessiecookies
-- Prisma + SQLite-database
+- een Next.js **Node-server** (API-routes, server components)
+- **Prisma + SQLite** voor opslag
 
-Daardoor werkt een echte deploy **niet** op `*.github.io`. Een static export zou login, opslaan en database breken.
+Zonder login wordt deploy **eenvoudiger**, maar Pages blijft **ongeschikt**: er is geen Node-runtime en geen werkende database. Een static export zou opslaan en projecten breken.
 
-## Aanbevolen: Render of Railway (gratis starters)
+## Aanbevolen: Render of Railway
 
-Beide kunnen `npm start` draaien (Node-server).
+Beide kunnen `npm start` draaien. Er is **geen** `auth:setup` of login nodig.
 
 ### Render — Web Service
 
-1. Ga naar [render.com](https://render.com) en koppel GitHub-repo `Itachi2002/waal`.
+1. Ga naar [render.com](https://render.com) en koppel GitHub-repo **Itachi2002/waal**.
 2. Nieuwe **Web Service**, branch `main`.
-3. Build command:
+3. **Build command:**
 
 ```bash
 npm ci && npx prisma generate && npx prisma migrate deploy && npm run db:seed && npm run build
 ```
 
-4. Start command:
+4. **Start command:**
 
 ```bash
 npm run start
 ```
 
-5. Environment variables:
+5. **Environment variables:**
 
 | Key | Waarde |
 |---|---|
 | `DATABASE_URL` | `file:./data/prod.db` |
-| `AUTH_SECRET` | lange willekeurige string |
-| `NODE_ENV` | `production` |
+| `NODE_VERSION` | `22` |
 
-6. Na eerste deploy: open de Render-shell of gebruik een one-off job:
+`AUTH_SECRET` / login zijn niet nodig voor deze demo.
 
-```bash
-AUTH_USERNAME=admin AUTH_PASSWORD='jouw-wachtwoord' npm run auth:setup
-```
+6. Optioneel: `npm run db:seed:demo` in de build toevoegen voor het fictieve demo-project.
 
-**Let op:** zonder persistent disk verdwijnt SQLite bij herstarts. Voor een demo is dat vaak acceptabel; voor blijvende data: persistent disk toevoegen of later PostgreSQL (TODO).
+7. Open de Render-URL → je komt direct op `/projects`.
+
+**Let op:** zonder persistent disk verdwijnt SQLite bij herstarts. Voor een afstudeerdemo vaak acceptabel; voor blijvende data: disk/volume of later PostgreSQL.
 
 ### Railway
 
-Vergelijkbaar: New Project → Deploy from GitHub → zelfde build/start en env vars. Voeg een volume toe op het pad van je databasebestand als je data wilt bewaren.
+New Project → Deploy from GitHub →zelfde build/start en `DATABASE_URL`. Volume koppelen als je data wilt bewaren.
 
-## Alternatief: Vercel
-
-Vercel is uitstekend voor Next.js, maar **SQLite-bestand is daar onbetrouwbaar** (ephemeral filesystem). Alleen gebruiken na migratie naar Postgres/Turso.
-
-## Lokaal blijft de bron van waarheid voor MVP
+## Lokaal (zonder login)
 
 ```bash
+cp .env.example .env
+npm install
+npm run db:migrate:dev
+npm run db:seed
 npm run dev
 ```
 
-Online is voor demo/deling; productie bij Waal vraagt nog HTTPS, accounts, backup en privacy (zie aannames/TODO’s).
+Open http://localhost:3000 — geen inloggen.

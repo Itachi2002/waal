@@ -21,7 +21,7 @@ Zie `docs/assumptions-and-todos.md` en `docs/source-map.md`.
 | ORM / DB | Prisma 6 + SQLite |
 | Validatie | Zod-achtige domeinvalidatie (pure functies + services) |
 | Tests | Vitest (unit/integratie), Playwright (e2e) |
-| Auth | Lokale single-admin, bcryptjs, opaque HttpOnly-sessiecookie |
+| Auth | **Uit voor demo** — open toegang; optionele auth-code blijft in repo |
 
 Exacte versies staan in `package-lock.json` na installatie.
 
@@ -44,16 +44,15 @@ Zonder logo toont de UI de tekstplaceholder **Waal**. Zie `reference/README.md`.
 
 ```bash
 cp .env.example .env
-# Vul AUTH_SECRET in met een lange willekeurige string
-
 npm install
 npm run db:migrate:dev   # of: npm run db:migrate
 npm run db:seed          # broncatalogi (overschrijft geen projectdata)
-npm run auth:setup       # lokale admin (of AUTH_USERNAME / AUTH_PASSWORD)
 npm run dev
 ```
 
-Open http://localhost:3000 → `/login`.
+Open http://localhost:3000 — **geen login**, je gaat direct naar projecten.
+
+Online zetten: zie `docs/deploy.md` (Render/Railway; **niet** GitHub Pages).
 
 ### Demo-data (optioneel, synthetisch)
 
@@ -82,13 +81,13 @@ npm start
 | `test:e2e` | Playwright |
 | `db:migrate` / `db:migrate:dev` | Migraties |
 | `db:seed` / `db:seed:demo` | Catalogus / demo |
-| `auth:setup` | Lokale login |
+| `auth:setup` | Optioneel (login is uitgeschakeld in de demo) |
 
 ## Routes
 
 | Pad | Inhoud |
 |---|---|
-| `/login` | Lokale aanmelding |
+| `/login` | Redirect naar projecten (login uit) |
 | `/projects` | Projectlijst |
 | `/projects/new` | Nieuw project (R01) |
 | `/projects/[id]/start` | Projectstart |
@@ -105,15 +104,13 @@ npm start
 - Herstel: zet het bestand terug en start opnieuw.
 - Reset **alleen** test/demo: verwijder testdatabase of herhaal `db:seed:demo`. Nooit productie-/gebruikers-DB willekeurig wissen.
 
-## Beveiliging (A11)
+## Beveiliging (demo)
 
-- Credentials via `auth:setup`, niet in Git.
-- Sessies: HttpOnly, SameSite=Lax, Secure op HTTPS, gehashte tokens.
+- **Geen login** in deze demo-versie — iedereen met de URL kan lezen/schrijven.
 - Mutaties: origincontrole + servervalidatie; geen mass assignment.
-- Login rate limiting (DB) voor single-process; bij meerdere processen is dit beperkt.
 - Geen analytics/trackers.
 
-**TODO bij echte ingebruikname:** hosting, HTTPS, accounts/rechten, privacy/bewaartermijn, backupbeleid.
+**TODO bij echte ingebruikname:** login opnieuw inschakelen, HTTPS, accounts/rechten, privacy/bewaartermijn, backupbeleid.
 
 ## Documentatie
 

@@ -1,6 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { EvaluationForm } from "@/components/projects/EvaluationForm";
-import { getSessionUser } from "@/lib/auth/session";
 import { getEvaluation } from "@/lib/services/evaluation";
 import { getProject } from "@/lib/services/projects";
 
@@ -9,7 +8,6 @@ export default async function EvaluationPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  if (!(await getSessionUser())) redirect("/login");
   const { id } = await params;
   if (!(await getProject(id))) notFound();
   const { streams, evaluation } = await getEvaluation(id);

@@ -1,10 +1,9 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ProjectForm } from "@/components/projects/ProjectForm";
 import {
   DECISION_ORDER,
   PROJECT_START_STEPS,
 } from "@/lib/domain/catalogs";
-import { getSessionUser } from "@/lib/auth/session";
 import { getProject } from "@/lib/services/projects";
 import { IconArrowRight, IconCheck } from "@/components/icons/Icons";
 
@@ -13,7 +12,6 @@ export default async function StartPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  if (!(await getSessionUser())) redirect("/login");
   const { id } = await params;
   const project = await getProject(id);
   if (!project) notFound();

@@ -1,6 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { QuickscanForm } from "@/components/projects/QuickscanForm";
-import { getSessionUser } from "@/lib/auth/session";
 import { getProject } from "@/lib/services/projects";
 import { getQuickscan } from "@/lib/services/quickscan";
 
@@ -9,7 +8,6 @@ export default async function QuickscanPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  if (!(await getSessionUser())) redirect("/login");
   const { id } = await params;
   if (!(await getProject(id))) notFound();
   const answers = await getQuickscan(id);

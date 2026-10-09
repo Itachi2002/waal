@@ -1,7 +1,6 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ProjectNav } from "@/components/layout/ProjectNav";
-import { getSessionUser } from "@/lib/auth/session";
 import { getProject } from "@/lib/services/projects";
 
 export default async function ProjectLayout({
@@ -11,7 +10,6 @@ export default async function ProjectLayout({
   children: React.ReactNode;
   params: Promise<{ id: string }>;
 }) {
-  if (!(await getSessionUser())) redirect("/login");
   const { id } = await params;
   const project = await getProject(id);
   if (!project) notFound();

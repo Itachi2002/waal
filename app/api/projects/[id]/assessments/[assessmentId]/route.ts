@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { assertSameOrigin } from "@/lib/auth/csrf";
-import { requireUser } from "@/lib/auth/session";
 import { jsonError } from "@/lib/api";
 import {
   deleteAssessment,
@@ -12,7 +11,6 @@ type Ctx = { params: Promise<{ id: string; assessmentId: string }> };
 
 export async function PUT(request: NextRequest, ctx: Ctx) {
   try {
-    await requireUser();
     await assertSameOrigin();
     const { id, assessmentId } = await ctx.params;
     const body = await request.json();
@@ -40,7 +38,6 @@ export async function PUT(request: NextRequest, ctx: Ctx) {
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
   try {
-    await requireUser();
     await assertSameOrigin();
     const { id, assessmentId } = await ctx.params;
     await deleteAssessment(id, assessmentId);

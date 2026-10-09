@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ValidationForm } from "@/components/projects/ValidationForm";
-import { getSessionUser } from "@/lib/auth/session";
 import { getProductValidation } from "@/lib/services/validation-product";
 
 export default async function ValidationPage() {
-  if (!(await getSessionUser())) redirect("/login");
   const v = await getProductValidation();
 
   return (

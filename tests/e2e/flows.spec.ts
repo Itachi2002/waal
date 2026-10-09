@@ -1,19 +1,14 @@
 import { test, expect } from "@playwright/test";
 
-const USER = process.env.E2E_USER || "e2eadmin";
-const PASS = process.env.E2E_PASSWORD || "e2e-test-password-ok";
-
-async function login(page: import("@playwright/test").Page) {
-  await page.goto("/login");
-  await page.getByLabel("Gebruikersnaam").fill(USER);
-  await page.getByLabel("Wachtwoord").fill(PASS);
-  await page.getByRole("button", { name: "Inloggen" }).click();
+/** Demo zonder login — open direct de projectlijst. */
+async function openApp(page: import("@playwright/test").Page) {
+  await page.goto("/projects");
   await expect(page).toHaveURL(/\/projects/);
 }
 
 test.describe("Flow A — project en quickscan", () => {
   test("nieuw project → Nee-fout → actie → herladen", async ({ page }) => {
-    await login(page);
+    await openApp(page);
     await page.getByRole("link", { name: "Nieuw project" }).click();
     await page.getByLabel("Project", { exact: true }).fill("E2E Testproject");
     await page.getByLabel("Verantwoordelijke scan").fill("E2E Scanner");
@@ -44,7 +39,7 @@ test.describe("Flow B/C — beoordeling en chemisch", () => {
   test("nog beoordelen → retour geweigerd → bevestigd → overname", async ({
     page,
   }) => {
-    await login(page);
+    await openApp(page);
     await page.getByRole("link", { name: "Nieuw project" }).click();
     await page.getByLabel("Project", { exact: true }).fill("E2E Stromen");
     await page.getByLabel("Verantwoordelijke scan").fill("E2E");
@@ -92,7 +87,7 @@ test.describe("Flow D/E — evaluatie en validatie", () => {
   test("evaluatie en onderzoeksvalidatie zonder totaalscore", async ({
     page,
   }) => {
-    await login(page);
+    await openApp(page);
     await page.getByRole("link", { name: "Nieuw project" }).click();
     await page.getByLabel("Project", { exact: true }).fill("E2E Eval");
     await page.getByLabel("Verantwoordelijke scan").fill("E2E");
@@ -122,7 +117,7 @@ test.describe("Flow D/E — evaluatie en validatie", () => {
 test.describe("toegankelijkheid mobiel", () => {
   test("375px navigatie en labels", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await login(page);
+    await openApp(page);
     await page.getByRole("link", { name: "Nieuw project" }).click();
     await expect(page.getByLabel("Project", { exact: true })).toBeVisible();
     await page.getByLabel("Project", { exact: true }).fill("Mobiel");

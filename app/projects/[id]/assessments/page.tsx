@@ -1,7 +1,6 @@
 import { Suspense } from "react";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { AssessmentsPanel } from "@/components/projects/AssessmentsPanel";
-import { getSessionUser } from "@/lib/auth/session";
 import { listAssessments } from "@/lib/services/assessments";
 import { getProject } from "@/lib/services/projects";
 import { getStreams } from "@/lib/services/streams";
@@ -11,7 +10,6 @@ export default async function AssessmentsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  if (!(await getSessionUser())) redirect("/login");
   const { id } = await params;
   if (!(await getProject(id))) notFound();
   const [assessments, streams] = await Promise.all([

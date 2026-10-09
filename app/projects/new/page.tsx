@@ -1,10 +1,7 @@
-import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ProjectForm } from "@/components/projects/ProjectForm";
-import { getSessionUser } from "@/lib/auth/session";
 
 export default async function NewProjectPage() {
-  if (!(await getSessionUser())) redirect("/login");
 
   return (
     <div className="app-shell">

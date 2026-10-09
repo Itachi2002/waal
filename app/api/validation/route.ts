@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { assertSameOrigin } from "@/lib/auth/csrf";
-import { requireUser } from "@/lib/auth/session";
 import { jsonError } from "@/lib/api";
 import {
   getProductValidation,
@@ -9,7 +8,6 @@ import {
 
 export async function GET() {
   try {
-    await requireUser();
     const validation = await getProductValidation();
     return NextResponse.json({ validation });
   } catch (e) {
@@ -19,7 +17,6 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    await requireUser();
     await assertSameOrigin();
     const body = await request.json();
     const validation = await saveProductValidation(body);

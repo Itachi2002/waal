@@ -1,13 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { getSessionUser } from "@/lib/auth/session";
 import { listProjects } from "@/lib/services/projects";
 import { IconArrowRight, IconPlus } from "@/components/icons/Icons";
 
 export default async function ProjectsPage() {
-  const session = await getSessionUser();
-  if (!session) redirect("/login");
   const projects = await listProjects();
 
   return (
