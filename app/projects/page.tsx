@@ -1,10 +1,24 @@
-import Link from "next/link";
-import { AppHeader } from "@/components/layout/AppHeader";
-import { listProjects } from "@/lib/services/projects";
-import { IconArrowRight, IconPlus } from "@/components/icons/Icons";
+"use client";
 
-export default async function ProjectsPage() {
-  const projects = await listProjects();
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { IconArrowRight, IconPlus } from "@/components/icons/Icons";
+import { store } from "@/lib/client/store";
+
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<
+    Array<{
+      id: string;
+      name: string;
+      projectNumber: string | null;
+      scanResponsible: string;
+    }>
+  >([]);
+
+  useEffect(() => {
+    setProjects(store.listProjects());
+  }, []);
 
   return (
     <div className="app-shell">
@@ -14,11 +28,11 @@ export default async function ProjectsPage() {
           <div>
             <h1 className="page-title">Projecten</h1>
             <p className="mt-1 text-sm text-[#666]">
-              Kies een scan of start een nieuw project.
+              Gegevens worden lokaal in deze browser opgeslagen.
             </p>
           </div>
           <Link
-            href="/projects/new"
+            href="/projects/new/"
             className="btn btn-primary shrink-0 gap-1.5 !px-3.5"
             aria-label="Nieuw project"
           >
@@ -37,7 +51,7 @@ export default async function ProjectsPage() {
             {projects.map((p) => (
               <li key={p.id}>
                 <Link
-                  href={`/projects/${p.id}/start`}
+                  href={`/projects/start/?id=${encodeURIComponent(p.id)}`}
                   className="surface-card flex items-center gap-3 active:bg-[var(--waal-gray)]"
                 >
                   <div className="min-w-0 flex-1">
@@ -57,7 +71,7 @@ export default async function ProjectsPage() {
 
         <p className="mt-8 text-center text-sm">
           <Link
-            href="/validation"
+            href="/validation/"
             className="font-medium text-[var(--waal-blue-dark)] underline"
           >
             Onderzoeksvalidatie

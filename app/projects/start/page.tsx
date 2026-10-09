@@ -1,20 +1,26 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { ProjectShell, useProjectId } from "@/components/layout/ProjectShell";
 import { ProjectForm } from "@/components/projects/ProjectForm";
 import {
   DECISION_ORDER,
   PROJECT_START_STEPS,
 } from "@/lib/domain/catalogs";
-import { getProject } from "@/lib/services/projects";
 import { IconArrowRight, IconCheck } from "@/components/icons/Icons";
+import { store, type StoredProject } from "@/lib/client/store";
+import { useStoreReady } from "@/lib/client/useStoreReady";
+import { Suspense, useEffect, useState } from "react";
 
-export default async function StartPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const project = await getProject(id);
-  if (!project) notFound();
+function StartContent() {
+  const id = useProjectId();
+  const ready = useStoreReady();
+  const [project, setProject] = useState<StoredProject | null>(null);
+
+  useEffect(() => {
+    if (ready && id) setProject(store.getProject(id));
+  }, [ready, id]);
+
+  if (!ready || !project) return <p className="text-sm text-[#666]">Laden…</p>;
 
   return (
     <div className="space-y-5">
@@ -22,8 +28,7 @@ export default async function StartPage({
         <h1 className="page-title">Projectstart</h1>
         <p className="mt-2 text-sm leading-relaxed text-[#555]">
           Inzicht in vrijkomende afval- en reststromen, oorzaken en passende
-          vervolgstappen. Geen automatische systeemkoppeling — gegevens handmatig
-          gebruiken.
+          vervolgstappen. Gegevens blijven in deze browser (GitHub Pages).
         </p>
       </header>
 
@@ -92,5 +97,15 @@ export default async function StartPage({
         />
       </section>
     </div>
+  );
+}
+
+export default function StartPage() {
+  return (
+    <ProjectShell>
+      <Suspense fallback={<p>Laden…</p>}>
+        <StartContent />
+      </Suspense>
+    </ProjectShell>
   );
 }

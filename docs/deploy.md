@@ -1,61 +1,40 @@
-# Online zetten (demo zonder login)
+# Online zetten via GitHub Pages
 
-## Waarom niet GitHub Pages?
+Live URL (na eerste succesvolle deploy):
 
-GitHub Pages serveert **alleen statische bestanden** (HTML/CSS/JS). Deze app heeft nog steeds:
+**https://itachi2002.github.io/waal/**
 
-- een Next.js **Node-server** (API-routes, server components)
-- **Prisma + SQLite** voor opslag
+## Architectuur
 
-Zonder login wordt deploy **eenvoudiger**, maar Pages blijft **ongeschikt**: er is geen Node-runtime en geen werkende database. Een static export zou opslaan en projecten breken.
+GitHub Pages host alleen statische bestanden. Daarom:
 
-## Aanbevolen: Render of Railway
+- Next.js `output: 'export'` met `basePath` `/waal`
+- Gegevens in **localStorage** (per browser), geen server/SQLite online
+- Geen login
 
-Beide kunnen `npm start` draaien. Er is **geen** `auth:setup` of login nodig.
+Wissen van browserdata of andere browser = andere/lege data.
 
-### Render — Web Service
+## Eenmalig in GitHub
 
-1. Ga naar [render.com](https://render.com) en koppel GitHub-repo **Itachi2002/waal**.
-2. Nieuwe **Web Service**, branch `main`.
-3. **Build command:**
+1. Open https://github.com/Itachi2002/waal  
+2. **Settings → Pages**  
+3. **Source:** GitHub Actions  
+4. Push naar `main` triggert [.github/workflows/pages.yml](../.github/workflows/pages.yml)
 
-```bash
-npm ci && npx prisma generate && npx prisma migrate deploy && npm run db:seed && npm run build
-```
-
-4. **Start command:**
+## Lokaal bouwen / previewen
 
 ```bash
-npm run start
-```
-
-5. **Environment variables:**
-
-| Key | Waarde |
-|---|---|
-| `DATABASE_URL` | `file:./data/prod.db` |
-| `NODE_VERSION` | `22` |
-
-`AUTH_SECRET` / login zijn niet nodig voor deze demo.
-
-6. Optioneel: `npm run db:seed:demo` in de build toevoegen voor het fictieve demo-project.
-
-7. Open de Render-URL → je komt direct op `/projects`.
-
-**Let op:** zonder persistent disk verdwijnt SQLite bij herstarts. Voor een afstudeerdemo vaak acceptabel; voor blijvende data: disk/volume of later PostgreSQL.
-
-### Railway
-
-New Project → Deploy from GitHub →zelfde build/start en `DATABASE_URL`. Volume koppelen als je data wilt bewaren.
-
-## Lokaal (zonder login)
-
-```bash
-cp .env.example .env
 npm install
-npm run db:migrate:dev
-npm run db:seed
+npm run build
+npx serve out
+```
+
+Open daarna de URL die `serve` toont. Let op: met `basePath` `/waal` moet je lokaal naar `/waal/` navigeren, of tijdelijk `basePath` uitzetten voor pure localhost-dev (`npm run dev` werkt zonder export).
+
+## Ontwikkelen
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:3000 — geen inloggen.
+Dev-server gebruikt dezelfde localStorage-store (geen API).

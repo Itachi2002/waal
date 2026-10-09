@@ -10,6 +10,11 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import {
+  ConflictError,
+  FieldValidationError,
+  store,
+} from "@/lib/client/store";
 
 type Values = {
   revision: number;
@@ -43,15 +48,13 @@ export function ValidationForm({ initial }: { initial: Values }) {
     setSaved(false);
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setErrors({});
     setSummary(null);
-    const res = await fetch("/api/validation", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      const validation = store.saveValidation({
         ...values,
         clarityScore: values.clarityScore || null,
         practicalityScore: values.practicalityScore || null,
@@ -59,18 +62,20 @@ export function ValidationForm({ initial }: { initial: Values }) {
         timeBurdenScore: values.timeBurdenScore || null,
         wouldUse: values.wouldUse || null,
         fitsWaal: values.fitsWaal || null,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      if (data.fields) setErrors(data.fields);
-      setSummary(data.error || "Opslaan mislukt.");
-      setSaving(false);
-      return;
+      });
+      setValues((v) => ({ ...v, revision: validation.revision }));
+      setDirty(false);
+      setSaved(true);
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+      } else if (err instanceof ConflictError) {
+        setSummary(err.message);
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
+      }
     }
-    setValues((v) => ({ ...v, revision: data.validation.revision }));
-    setDirty(false);
-    setSaved(true);
     setSaving(false);
   }
 

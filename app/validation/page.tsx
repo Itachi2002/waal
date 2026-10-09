@@ -1,22 +1,38 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ValidationForm } from "@/components/projects/ValidationForm";
-import { getProductValidation } from "@/lib/services/validation-product";
+import { store, type StoredValidation } from "@/lib/client/store";
 
-export default async function ValidationPage() {
-  const v = await getProductValidation();
+export default function ValidationPage() {
+  const [v, setV] = useState<StoredValidation | null>(null);
+  useEffect(() => {
+    setV(store.getValidation());
+  }, []);
+
+  if (!v) {
+    return (
+      <div className="app-shell">
+        <AppHeader showBackToProjects />
+        <main className="app-main app-main--no-tabs">
+          <p>Laden…</p>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
       <AppHeader showBackToProjects />
       <main className="app-main app-main--no-tabs">
-        <h1 className="text-2xl font-semibold mb-2">
-          Validatie beroepsproduct
-        </h1>
+        <h1 className="page-title mb-2">Validatie beroepsproduct</h1>
         <div className="mb-5 surface-card !bg-[#fff8e8] text-sm">
           <p className="font-medium">Afbakening</p>
           <p className="mt-1 text-[#555]">
-            Eenmalig onderzoeksformulier — geen projectprestatiemeting.
+            Eenmalig onderzoeksformulier — geen projectprestatiemeting. Opslag
+            lokaal in deze browser.
           </p>
         </div>
         <div className="surface-card">
@@ -48,7 +64,10 @@ export default async function ValidationPage() {
           />
         </div>
         <p className="mt-6 text-center">
-          <Link href="/projects" className="text-sm text-[var(--waal-blue-dark)] underline">
+          <Link
+            href="/projects/"
+            className="text-sm text-[var(--waal-blue-dark)] underline"
+          >
             Terug naar projecten
           </Link>
         </p>

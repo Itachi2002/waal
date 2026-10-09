@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import {
+  ConflictError,
+  FieldValidationError,
+  store,
+} from "@/lib/client/store";
 
 export type ProjectFormValues = {
   name: string;
@@ -43,44 +48,42 @@ export function ProjectForm({
     setSaved(false);
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setSummary(null);
     setErrors({});
     try {
-      const url =
-        mode === "create" ? "/api/projects" : `/api/projects/${projectId}`;
-      const res = await fetch(url, {
-        method: mode === "create" ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.fields) setErrors(data.fields);
-        setSummary(data.error || "Opslaan mislukt.");
-        const first = data.fields && Object.keys(data.fields)[0];
-        if (first) document.getElementById(first)?.focus();
-        setSaving(false);
-        return;
-      }
-      setDirty(false);
-      setSaved(true);
       if (mode === "create") {
-        router.push(`/projects/${data.project.id}/start`);
+        const project = store.createProject(values);
+        setDirty(false);
+        setSaved(true);
+        router.push(`/projects/start/?id=${encodeURIComponent(project.id)}`);
       } else {
-        setValues((v) => ({ ...v, revision: data.project.revision }));
-        router.refresh();
+        const project = store.updateProject(projectId!, {
+          ...values,
+          revision: values.revision ?? 1,
+        });
+        setValues((v) => ({ ...v, revision: project.revision }));
+        setDirty(false);
+        setSaved(true);
       }
-    } catch {
-      setSummary("Opslaan mislukt. Invoer is behouden.");
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+        const first = Object.keys(err.fields)[0];
+        if (first) document.getElementById(first)?.focus();
+      } else if (err instanceof ConflictError) {
+        setSummary(err.message);
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
+      }
     }
     setSaving(false);
   }
 
-  const inputClass =
-    "w-full min-h-[44px] rounded border border-[#c5ced6] bg-white px-3";
+  const inputClass = "input-app";
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>

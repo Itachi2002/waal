@@ -22,6 +22,11 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import {
+  ConflictError,
+  FieldValidationError,
+  store,
+} from "@/lib/client/store";
 
 type StreamRow = {
   streamCode: string;
@@ -71,53 +76,50 @@ export function StreamsForm({
     setSaved(false);
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setErrors({});
     setSummary(null);
-    const streams = rows.map((r) => ({
-      streamCode: r.streamCode,
-      occurs: r.occurs || null,
-      constructionPhase: r.constructionPhase || null,
-      quantity: r.quantity || null,
-      unit: r.unit || null,
-      causeCode: r.causeCode || null,
-      nextRoute: r.nextRoute || null,
-    }));
-    const revisions = Object.fromEntries(
-      rows.map((r) => [r.streamCode, r.revision]),
-    );
-    const res = await fetch(`/api/projects/${projectId}/streams`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ streams, revisions }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      if (data.fields) setErrors(data.fields);
-      setSummary(data.error || "Opslaan mislukt.");
-      setSaving(false);
-      return;
-    }
-    if (data.streams) {
+    try {
+      const streams = store.saveStreams(
+        projectId,
+        rows.map((r) => ({
+          streamCode: r.streamCode,
+          occurs: r.occurs || null,
+          constructionPhase: r.constructionPhase || null,
+          quantity: r.quantity || null,
+          unit: r.unit || null,
+          causeCode: r.causeCode || null,
+          nextRoute: r.nextRoute || null,
+        })),
+        Object.fromEntries(rows.map((r) => [r.streamCode, r.revision])),
+      );
       setRows((prev) =>
         prev.map((r) => {
-          const updated = data.streams.find(
-            (s: StreamRow) => s.streamCode === r.streamCode,
-          );
+          const updated = streams.find((s) => s.streamCode === r.streamCode);
           return updated
             ? {
                 ...r,
                 revision: updated.revision,
                 quantity: updated.quantity ?? "",
+                id: updated.id,
               }
             : r;
         }),
       );
+      setDirty(false);
+      setSaved(true);
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+      } else if (err instanceof ConflictError) {
+        setSummary(err.message);
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
+      }
     }
-    setDirty(false);
-    setSaved(true);
     setSaving(false);
   }
 
@@ -252,7 +254,7 @@ export function StreamsForm({
                 Nog beoordelen —{" "}
                 <Link
                   className="underline"
-                  href={`/projects/${projectId}/assessments?stream=${r.id}`}
+                  href={`/projects/assessments/?id=${encodeURIComponent(projectId)}&stream=${encodeURIComponent(r.id)}`}
                 >
                   Open beoordeling voor deze stroom
                 </Link>

@@ -13,6 +13,11 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import {
+  ConflictError,
+  FieldValidationError,
+  store,
+} from "@/lib/client/store";
 
 type StreamRow = {
   groupCode: string;
@@ -67,15 +72,13 @@ export function EvaluationForm({
     setSaved(false);
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setErrors({});
     setSummary(null);
-    const res = await fetch(`/api/projects/${projectId}/evaluation`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      const evaluation = store.saveEvaluation(projectId, {
         revision: rev,
         streams: rows.map((r) => ({
           groupCode: r.groupCode,
@@ -86,18 +89,20 @@ export function EvaluationForm({
           explanation: r.explanation || null,
         })),
         ...questions,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      if (data.fields) setErrors(data.fields);
-      setSummary(data.error || "Opslaan mislukt.");
-      setSaving(false);
-      return;
+      });
+      setRev(evaluation.revision);
+      setDirty(false);
+      setSaved(true);
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+      } else if (err instanceof ConflictError) {
+        setSummary(err.message);
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
+      }
     }
-    if (data.evaluation) setRev(data.evaluation.revision);
-    setDirty(false);
-    setSaved(true);
     setSaving(false);
   }
 

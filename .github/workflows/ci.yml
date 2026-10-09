@@ -8,8 +8,6 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: file:./ci.db
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,12 +15,7 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npx prisma migrate deploy
-      - run: npm run db:seed
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
-      - run: npm run test:integration
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e -- --project=chromium

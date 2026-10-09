@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   ASSESSMENT_ROUTE_LABELS,
   ASSESSMENT_ROUTES,
@@ -28,6 +28,11 @@ import {
   IconSearch,
   IconTrash,
 } from "@/components/icons/Icons";
+import {
+  ConflictError,
+  FieldValidationError,
+  store,
+} from "@/lib/client/store";
 
 type StreamOpt = { id: string; streamCode: string; revision: number };
 type Assessment = {
@@ -63,17 +68,29 @@ const emptyForm = {
 
 export function AssessmentsPanel({
   projectId,
-  assessments,
-  streams,
+  assessments: initialAssessments,
+  streams: initialStreams,
 }: {
   projectId: string;
   assessments: Assessment[];
   streams: StreamOpt[];
 }) {
   const search = useSearchParams();
-  const router = useRouter();
   const prelink = search.get("stream") || "";
+  const [assessments, setAssessments] = useState(initialAssessments);
+  const [streams, setStreams] = useState(initialStreams);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  function reload() {
+    setAssessments(store.listAssessments(projectId) as Assessment[]);
+    setStreams(
+      store.getStreams(projectId).map((s) => ({
+        id: s.id,
+        streamCode: s.streamCode,
+        revision: s.revision,
+      })),
+    );
+  }
   const [form, setForm] = useState({
     ...emptyForm,
     projectMaterialStreamId: prelink,
@@ -120,7 +137,7 @@ export function AssessmentsPanel({
     setErrors({});
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setErrors({});
@@ -140,46 +157,41 @@ export function AssessmentsPanel({
       applyRouteToStream: form.applyRouteToStream,
       streamRevision,
     };
-    const url = editingId
-      ? `/api/projects/${projectId}/assessments/${editingId}`
-      : `/api/projects/${projectId}/assessments`;
-    const res = await fetch(url, {
-      method: editingId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      if (data.fields) setErrors(data.fields);
-      setSummary(data.error || "Opslaan mislukt.");
-      setSaving(false);
-      return;
+    try {
+      const assessment = editingId
+        ? store.updateAssessment(projectId, editingId, payload)
+        : store.createAssessment(projectId, payload);
+      setDirty(false);
+      setSaved(true);
+      if (!editingId) setEditingId(assessment.id);
+      setForm((f) => ({ ...f, revision: assessment.revision }));
+      reload();
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+      } else if (err instanceof ConflictError) {
+        setSummary(err.message);
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
+      }
     }
-    setDirty(false);
-    setSaved(true);
     setSaving(false);
-    router.refresh();
-    if (!editingId && data.assessment) {
-      setEditingId(data.assessment.id);
-      setForm((f) => ({ ...f, revision: data.assessment.revision }));
-    } else if (data.assessment) {
-      setForm((f) => ({ ...f, revision: data.assessment.revision }));
-    }
   }
 
-  async function onDelete(id: string) {
+  function onDelete(id: string) {
     if (!confirm("Deze beoordeling verwijderen? Dit kan niet ongedaan worden gemaakt.")) {
       return;
     }
-    const res = await fetch(`/api/projects/${projectId}/assessments/${id}`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
+    try {
+      store.deleteAssessment(projectId, id);
       if (editingId === id) {
         setShowForm(false);
         setEditingId(null);
       }
-      router.refresh();
+      reload();
+    } catch {
+      setSummary("Verwijderen mislukt.");
     }
   }
 

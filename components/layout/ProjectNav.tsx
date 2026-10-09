@@ -25,6 +25,7 @@ const LINKS = [
 
 export function ProjectNav({ projectId }: { projectId: string }) {
   const pathname = usePathname();
+  const q = `?id=${encodeURIComponent(projectId)}`;
 
   return (
     <>
@@ -34,8 +35,8 @@ export function ProjectNav({ projectId }: { projectId: string }) {
       >
         <ul className="flex flex-wrap gap-1.5">
           {LINKS.map((l) => {
-            const href = `/projects/${projectId}/${l.href}`;
-            const active = pathname?.includes(`/${l.href}`);
+            const href = `/projects/${l.href}/${q}`;
+            const active = pathname?.includes(`/projects/${l.href}`);
             const Icon = l.Icon;
             return (
               <li key={l.href}>
@@ -62,8 +63,8 @@ export function ProjectNav({ projectId }: { projectId: string }) {
       >
         <ul className="grid grid-cols-5">
           {LINKS.map((l) => {
-            const href = `/projects/${projectId}/${l.href}`;
-            const active = pathname?.includes(`/${l.href}`);
+            const href = `/projects/${l.href}/${q}`;
+            const active = pathname?.includes(`/projects/${l.href}`);
             const Icon = l.Icon;
             return (
               <li key={l.href}>

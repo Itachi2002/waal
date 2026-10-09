@@ -16,7 +16,7 @@ export function AppHeader({
       <div className="flex items-center justify-between gap-3 px-3 py-3 min-h-[var(--app-header-h)]">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link
-            href="/projects"
+            href="/projects/"
             className="shrink-0 rounded-xl focus-visible:outline-offset-4"
             aria-label="Naar projecten"
           >
@@ -40,12 +40,12 @@ export function AppHeader({
           )}
         </div>
         {showBackToProjects ? (
-          <Link
-            href="/projects"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d8dee5] bg-white text-[var(--waal-blue-dark)]"
-            aria-label="Alle projecten"
-            title="Projecten"
-          >
+            <Link
+              href="/projects/"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d8dee5] bg-white text-[var(--waal-blue-dark)]"
+              aria-label="Alle projecten"
+              title="Projecten"
+            >
             <IconFolder className="h-5 w-5" />
           </Link>
         ) : null}

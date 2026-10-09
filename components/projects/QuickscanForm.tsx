@@ -10,6 +10,7 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { FormField } from "@/components/forms/FormField";
 import { SaveBar } from "@/components/forms/SaveBar";
 import { useUnsavedWarning } from "@/lib/client/useUnsavedWarning";
+import { FieldValidationError, store } from "@/lib/client/store";
 
 type Answer = {
   questionCode: string;
@@ -49,36 +50,33 @@ export function QuickscanForm({
     setSaved(false);
   }
 
-  async function onSubmit(e: FormEvent) {
+  function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setErrors({});
     setSummary(null);
-    const payload = answers.map((a) => ({
-      questionCode: a.questionCode,
-      status: a.status || null,
-      followUpAction: a.followUpAction || null,
-      responsible: a.responsible || null,
-    }));
-    const res = await fetch(`/api/projects/${projectId}/quickscan`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers: payload }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      if (data.fields) setErrors(data.fields);
-      setSummary(data.error || "Opslaan mislukt.");
-      const first = data.fields && Object.keys(data.fields)[0];
-      if (first) {
-        const el = document.getElementById(first.replace(".", "-"));
-        el?.focus();
+    try {
+      store.saveQuickscan(
+        projectId,
+        answers.map((a) => ({
+          questionCode: a.questionCode,
+          status: a.status || null,
+          followUpAction: a.followUpAction || null,
+          responsible: a.responsible || null,
+        })),
+      );
+      setDirty(false);
+      setSaved(true);
+    } catch (err) {
+      if (err instanceof FieldValidationError) {
+        setErrors(err.fields);
+        setSummary(err.message);
+        const first = Object.keys(err.fields)[0];
+        if (first) document.getElementById(first.replace(".", "-"))?.focus();
+      } else {
+        setSummary("Opslaan mislukt. Invoer is behouden.");
       }
-      setSaving(false);
-      return;
     }
-    setDirty(false);
-    setSaved(true);
     setSaving(false);
   }
 
