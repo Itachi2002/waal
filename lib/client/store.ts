@@ -34,6 +34,7 @@ import {
   type YesPartialNo,
 } from "@/lib/domain/catalogs";
 import { isEvaluationRoute } from "@/lib/domain/route-rules";
+import { buildDemoProjects } from "@/lib/client/demo-projects";
 
 const STORAGE_KEY = "waal-projectscan-v1";
 
@@ -203,18 +204,31 @@ function defaultDb(): DbShape {
   return { projects: [], validation: emptyValidation() };
 }
 
+function seededDb(): DbShape {
+  return {
+    projects: buildDemoProjects(),
+    validation: emptyValidation(),
+  };
+}
+
 function readDb(): DbShape {
   if (typeof window === "undefined") return defaultDb();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const db = defaultDb();
+      const db = seededDb();
       writeDb(db);
       return db;
     }
-    return JSON.parse(raw) as DbShape;
+    const parsed = JSON.parse(raw) as DbShape;
+    if (!parsed.projects?.length) {
+      const db = seededDb();
+      writeDb(db);
+      return db;
+    }
+    return parsed;
   } catch {
-    return defaultDb();
+    return seededDb();
   }
 }
 

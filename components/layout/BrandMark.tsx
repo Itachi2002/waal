@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { withBasePath } from "@/lib/base-path";
 
 /**
  * Meegeleverd Waal-logo ongewijzigd (geen recolor/stretch).
@@ -33,7 +34,7 @@ export function BrandMark({
   return (
     // eslint-disable-next-line @next/next/no-img-element -- bronlogo ongewijzigd houden
     <img
-      src="/brand/waal-logo.jpeg"
+      src={withBasePath("/brand/waal-logo.jpeg")}
       alt="Waal"
       width={220}
       height={88}
